@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  votes     Json     // Armazena todos os votos como JSON
+  userId    String?  // Opcional: se quiser rastrear usuário
+  ipAddress String?  // Opcional: para prevenir duplicatas
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("votes")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  nominees    Nominee[]
+
+  @@map("categories")
+}
+
+model Nominee {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  imageUrl    String
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  voteCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("nominees")
+}
+
+// ============================================
+// 3. VARIÁVEIS DE AMBIENTE
+// Arquivo: .env
+// ============================================
+/*
+# Database URL - Use um destes provedores:
+# Opção 1: Vercel Postgres (Recomendado para Vercel)
+DATABASE_URL="postgres://user:password@host:5432/database"
+
+// ============================================
+// 8. COMANDOS PARA EXECUTAR
+// ============================================
+/*
+# 1. Gerar as tabelas no banco
+npx prisma generate
+
+# 2. Criar as migrations
+npx prisma migrate dev --name init
+
+# 3. Visualizar o banco de dados (opcional)
+npx prisma studio
+
+# 4. Seed inicial (popular categorias e nomeados)
+npx prisma db seed
+*/
