@@ -1,9 +1,32 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Trophy, TrendingUp, Users } from 'lucide-react';
+import Image from 'next/image';
+
+interface Nominee {
+    id: number;
+    name: string;
+    description: string;
+    imageUrl: string;
+    voteCount: number;
+    percentage: string;
+}
+
+interface CategoryResult {
+    categoryName: string;
+    categoryOrder: number;
+    nominees: Nominee[];
+    totalVotes: number;
+}
+
+interface ResultsData {
+    totalVotes: number;
+    results: Record<string, CategoryResult>;
+}
 
 export default function ResultsPage() {
-    const [results, setResults] = useState(null);
+    const [results, setResults] = useState<ResultsData | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -12,36 +35,147 @@ export default function ResultsPage() {
             .then(data => {
                 setResults(data);
                 setLoading(false);
+            })
+            .catch(error => {
+                console.error('Erro ao carregar resultados:', error);
+                setLoading(false);
             });
     }, []);
 
-    if (loading) return <div>Carregando resultados...</div>;
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 flex items-center justify-center">
+                <div className="text-white text-2xl">Carregando resultados...</div>
+            </div>
+        );
+    }
 
-    return (<>
-    </>
-        // <div className="p-8">
-        //     <h1 className="text-3xl font-bold mb-6">
-        //         Resultados da Votação
-        //     </h1>
-        //     <p className="text-xl mb-8">
-        //         Total de votos: {results?.totalVotes}
-        //     </p>
+    if (!results) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 flex items-center justify-center">
+                <div className="text-white text-2xl">Erro ao carregar resultados</div>
+            </div>
+        );
+    }
 
-        //     {Object.entries(results?.results).map(([slug, data]) => (
-        //         <div key={slug} className="mb-8 bg-white rounded-lg p-6 shadow">
-        //             <h2 className="text-2xl font-semibold mb-4">
-        //                 {data?.categoryName}
-        //             </h2>
-        //             {data?.nominees?.map(nominee => (
-        //                 <div key={nominee.id} className="mb-2 flex justify-between">
-        //                     <span>{nominee.name}</span>
-        //                     <span className="font-bold">
-        //                         {nominee.voteCount} votos ({nominee.percentage}%)
-        //                     </span>
-        //                 </div>
-        //             ))}
-        //         </div>
-        //     ))}
-        // </div>
+    const categoriesArray = Object.entries(results.results)
+        .map(([slug, data]) => ({ slug, ...data }))
+        .sort((a, b) => a.categoryOrder - b.categoryOrder);
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 py-8 px-4">
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="text-center mb-12">
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full mb-6">
+                        <Trophy className="w-10 h-10 text-white" />
+                    </div>
+                    <h1 className="text-5xl font-bold text-white mb-4">
+                        Resultados da Votação
+                    </h1>
+                    <div className="flex items-center justify-center gap-2 text-white/80 text-xl">
+                        <Users className="w-6 h-6" />
+                        <span>Total de votos: {results.totalVotes}</span>
+                    </div>
+                </div>
+
+                {/* Categories */}
+                <div className="space-y-8">
+                    {categoriesArray.map((category) => (
+                        <div
+                            key={category.slug}
+                            className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20"
+                        >
+                            <h2 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
+                                <span className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full text-lg">
+                                    {category.categoryOrder}
+                                </span>
+                                {category.categoryName}
+                            </h2>
+
+                            <div className="space-y-4">
+                                {category.nominees.map((nominee, index) => {
+                                    const isWinner = index === 0 && nominee.voteCount > 0;
+                                    return (
+                                        <div
+                                            key={nominee.id}
+                                            className={`bg-white/5 backdrop-blur-sm rounded-xl p-4 border ${
+                                                isWinner
+                                                    ? 'border-yellow-400/50 bg-gradient-to-r from-yellow-400/10 to-transparent'
+                                                    : 'border-white/10'
+                                            }`}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                {/* Position */}
+                                                <div
+                                                    className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
+                                                        isWinner
+                                                            ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white'
+                                                            : 'bg-white/10 text-white/60'
+                                                    }`}
+                                                >
+                                                    {isWinner ? <Trophy className="w-6 h-6" /> : index + 1}
+                                                </div>
+
+                                                {/* Image */}
+                                                <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-white/10">
+                                                    <Image
+                                                        src={nominee.imageUrl}
+                                                        alt={nominee.name}
+                                                        width={64}
+                                                        height={64}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+
+                                                {/* Name and Description */}
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="text-xl font-bold text-white mb-1">
+                                                        {nominee.name}
+                                                    </h3>
+                                                    <p className="text-white/60 text-sm line-clamp-1">
+                                                        {nominee.description}
+                                                    </p>
+                                                </div>
+
+                                                {/* Stats */}
+                                                <div className="flex-shrink-0 text-right">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <TrendingUp className="w-5 h-5 text-green-400" />
+                                                        <span className="text-2xl font-bold text-white">
+                                                            {nominee.percentage}%
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-white/60 text-sm">
+                                                        {nominee.voteCount} {nominee.voteCount === 1 ? 'voto' : 'votos'}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Progress Bar */}
+                                            <div className="mt-3 h-2 bg-white/10 rounded-full overflow-hidden">
+                                                <div
+                                                    className={`h-full transition-all duration-500 ${
+                                                        isWinner
+                                                            ? 'bg-gradient-to-r from-yellow-400 to-yellow-600'
+                                                            : 'bg-gradient-to-r from-purple-500 to-indigo-500'
+                                                    }`}
+                                                    style={{ width: `${nominee.percentage}%` }}
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Category Stats */}
+                            <div className="mt-4 pt-4 border-t border-white/10 text-white/60 text-sm">
+                                Total de votos nesta categoria: {category.totalVotes}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
     );
 }

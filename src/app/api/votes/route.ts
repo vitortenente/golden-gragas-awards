@@ -14,9 +14,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Verificar se todas as 10 categorias foram votadas
+        // Verificar se todas as 7 categorias foram votadas
         const voteKeys = Object.keys(votes);
-        if (voteKeys.length !== 10) {
+        if (voteKeys.length !== 7) {
             return NextResponse.json(
                 { error: 'Todas as categorias devem ser votadas' },
                 { status: 400 }
@@ -78,9 +78,12 @@ export async function POST(request: NextRequest) {
 async function updateNomineeVoteCounts(votes: Record<string, number>) {
     const updatePromises = Object.values(votes).map(nomineeId =>
         prisma.nominee.update({
-            where: { id: String(nomineeId) },
+            where: { id: Number(nomineeId) },
             data: { voteCount: { increment: 1 } }
-        }).catch(() => null) // Ignora erros individuais
+        }).catch((error) => {
+            console.error(`Erro ao atualizar nominee ${nomineeId}:`, error);
+            return null;
+        })
     );
 
     await Promise.all(updatePromises);
