@@ -28,19 +28,16 @@ export async function POST(request: NextRequest) {
         const realIp = request.headers.get('x-real-ip');
         const ipAddress = forwarded?.split(',')[0] || realIp || 'unknown';
 
-        // Opcional: Verificar se IP já votou (nas últimas 24h por exemplo)
-        const recentVote = await prisma.vote.findFirst({
+        // Verificar se IP já votou (bloqueio permanente)
+        const existingVote = await prisma.vote.findFirst({
             where: {
                 ipAddress,
-                createdAt: {
-                    gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 horas atrás
-                }
             }
         });
 
-        if (recentVote) {
+        if (existingVote) {
             return NextResponse.json(
-                { error: 'Você já votou.' },
+                { error: 'Você já votou. Cada pessoa pode votar apenas uma vez.' },
                 { status: 429 }
             );
         }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Trophy, TrendingUp, Users } from 'lucide-react';
+import { Trophy, TrendingUp, Users, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 
 interface Nominee {
@@ -45,7 +45,10 @@ export default function ResultsPage() {
     if (loading) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 flex items-center justify-center">
-                <div className="text-white text-2xl">Carregando resultados...</div>
+                <div className="text-center">
+                    <Loader2 className="w-16 h-16 text-white animate-spin mx-auto mb-4" />
+                    <div className="text-white text-2xl font-semibold">Carregando resultados...</div>
+                </div>
             </div>
         );
     }
@@ -68,7 +71,7 @@ export default function ResultsPage() {
                 {/* Header */}
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full mb-6">
-                        <Trophy className="w-10 h-10 text-white" />
+                        <Image alt='Golden Gragas' src={'/golden-gragas.png'} width={112} height={112}  />
                     </div>
                     <h1 className="text-5xl font-bold text-white mb-4">
                         Resultados da Votação

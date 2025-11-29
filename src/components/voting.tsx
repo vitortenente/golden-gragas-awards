@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Trophy, CheckCircle, AlertCircle } from 'lucide-react';
+import Image from 'next/image';
 
 const categories = [
   {
@@ -153,7 +154,8 @@ export default function VotingSystem() {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Trophy className="w-8 h-8 text-yellow-400" />
+              {/* <Trophy className="w-8 h-8 text-yellow-400" /> */}
+              <Image alt='Golden Gragas' src={'/golden-gragas.png'} width={42} height={42}  />
               <div>
                 <h1 className="text-2xl font-bold text-white">Premiação Gragão de Ouro 2025</h1>
                 <p className="text-purple-200 text-sm">Vote nos seus favoritos</p>
