@@ -1,8 +1,9 @@
 'use client'
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Trophy, CheckCircle, AlertCircle } from 'lucide-react';
+import { Trophy, CheckCircle, AlertCircle, BarChart3 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const categories = [
   {
@@ -151,19 +152,29 @@ export default function VotingSystem() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900">
       <div className="bg-black/30 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {/* <Trophy className="w-8 h-8 text-yellow-400" /> */}
-              <Image alt='Golden Gragas' src={'/golden-gragas.png'} width={42} height={42}  />
-              <div>
-                <h1 className="text-2xl font-bold text-white">Premiação Gragão de Ouro 2025</h1>
-                <p className="text-purple-200 text-sm">Vote nos seus favoritos</p>
+        <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+              <div className="w-8 h-8 md:w-[42px] md:h-[42px] flex-shrink-0">
+                <Image alt='Golden Gragas' src={'/golden-gragas.png'} width={42} height={42} className="w-full h-full" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-sm md:text-2xl font-bold text-white truncate">Gragão de Ouro 2025</h1>
+                <p className="text-purple-200 text-xs md:text-sm hidden sm:block">Vote nos seus favoritos</p>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-white font-semibold text-lg">{getVoteCount()}/{categories.length}</div>
-              <div className="text-purple-200 text-sm">categorias votadas</div>
+            <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+              <Link
+                href="/results"
+                className="flex items-center gap-1 md:gap-2 px-2 md:px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold rounded-lg transition-all duration-200 text-xs md:text-base"
+              >
+                <BarChart3 className="w-4 h-4 md:w-5 md:h-5" />
+                <span className="hidden sm:inline">Ver Resultados</span>
+              </Link>
+              <div className="text-right">
+                <div className="text-white font-semibold text-sm md:text-lg">{getVoteCount()}/{categories.length}</div>
+                <div className="text-purple-200 text-xs md:text-sm whitespace-nowrap">categorias</div>
+              </div>
             </div>
           </div>
         </div>
